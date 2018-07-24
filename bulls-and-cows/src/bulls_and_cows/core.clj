@@ -1,29 +1,29 @@
 (ns bulls-and-cows.core)
 
-; перевод вводимого числа в посимвольный формат
 (defn number->digits
+  "Перевод вводимого числа в посимвольный формат"
   [value]
   (seq value))
 
-; подсчёт быков
 (defn bulls
+  "Подсчет быков"
   [guess secret]
   (->>
     (map = guess secret)
     (filter true?)
     count))
 
-; проверка -- является ли цифра коровой
 (defn cow?
+  "Проверка: является ли цифра коровой"
   [secret digit]
   (contains? (set secret) digit))
 
-; подсчет суммарного числа быков и коров
 (defn bulls-and-cows
+  "Подсчет суммарного числа быков и коров"
   [guess secret]
   (->>
     (map #(cow? secret %)
-      guess)
+         guess)
     (filter true?)
     (count)))
 
@@ -31,15 +31,15 @@
   (number->digits "123")
   (number->digits "453"))
 
-; подсчет коров
 (defn cows
+  "Подсчет коров"
   [guess secret]
   (-
     (bulls-and-cows guess secret)
     (bulls guess secret)))
 
-; обработка текущего состояния и получение результата
 (defn check-guess
+  "Обработка текущего состояния и получение результата"
   [guess secret]
   (if (= guess secret)
     {:correct? true}
@@ -49,17 +49,17 @@
 
 (comment
   (check-guess
-   {:guess  (number->digits "123")
-    :secret (number->digits "452")}))
+    {:guess  (number->digits "123")
+     :secret (number->digits "452")}))
 
-; генерирование числа secret
 (defn generate-secret
+  "Генерирование числа secret"
   []
   (number->digits "345"))
 
-; одна итерация игры: чтение числа пользователя
-; и вывод результата в консоль
 (defn game-step
+  "Одна итерация игры: чтение числа пользователя и
+  вывод реузльтата в консоль"
   [secret]
   (let [{:keys [correct? bulls cows]}
         (->>
@@ -71,9 +71,10 @@
       (println (format "bulls %s, cows %s" bulls cows)))
     (not correct?)))
 
-; запуск игры
-; критерий остановки: пользователь отгадал число
 (defn run-game
+  "Запуск игры
+  Критерий остановки: пользователь отгадал число"
   []
   (let [secret (generate-secret)]
     (while (game-step secret))))
+

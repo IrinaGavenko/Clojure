@@ -1,104 +1,66 @@
 (ns bulls-and-cows.core-test
   (:require [clojure.test :refer :all]
-            [bulls-and-cows.core :refer :all]))
+            [bulls-and-cows.core :as core]))
 
-(deftest _number->digit)
+(deftest number->digits
+  (are [digits number]
+    (= digits (core/number->digits number))
+    [\1 \2 \3] "123"
+    nil nil))
 
-(deftest _generate-secret
-  (is (=
-        (number->digits "345")
-        (generate-secret)
-        )))
+(deftest bulls
+  (are [result guess secret]
+    (= result (core/bulls
+                (core/number->digits guess)
+                (core/number->digits secret)))
+    3 "123" "123"
+    1 "122" "252"
+    0 "123" "456"))
 
-(deftest _bulls-1
-  (is (=
-        3
-        (bulls
-          (number->digits "123")
-          (number->digits "123")))))
+(deftest cow?
+  (are [result secret digit]
+    (= result (core/cow? secret digit))
+    true "123" \2
+    true "123" \3
+    false "123" 2
+    false "123" "2"))
 
-(deftest _bulls-2
-  (is (=
-        1
-        (bulls
-          (number->digits "122")
-          (number->digits "252")))))
-(deftest _bulls-3
-  (is (=
-        0
-        (bulls
-          (number->digits "123")
-          (number->digits "456")))))
-(deftest _cow?-1
-  (is (=
-        true
-        (cow? "123" \2))))
-(deftest _cow?-2
-  (is (=
-        true
-        (cow? "123" \3))))
-(deftest _cow?-3
-  (is (=
-        false
-        (cow? "123" 2))))
-(deftest _cow?-4
-  (is (=
-        false
-        (cow? "123" "2"))))
-(deftest _bulls-and-cows-1
-  (is (=
-        2
-        (bulls-and-cows
-          (number->digits "122")
-          (number->digits "252")))))
-(deftest _bulls-and-cows-2
-  (is (=
-        1
-        (bulls-and-cows
-          (number->digits "452")
-          (number->digits "122")))))
-(deftest _cows-1
-  (is (=
-        0
-        (cows
-          (number->digits "123")
-          (number->digits "123")))))
-(deftest _cows-2
-  (is (=
-        1
-        (cows
-          (number->digits "122")
-          (number->digits "452")))))
-(deftest _cows-3
-  (is (=
-        0
-        (cows
-          (number->digits "452")
-          (number->digits "122")))))
-(deftest _check-guess-1
-  (is (=
-        {:correct? false :bulls 1 :cows 0}
-        (check-guess
-          (number->digits "123")
-          (number->digits "426")))))
-(deftest _check-guess-2
-  (is (=
-        {:correct? false :bulls 1 :cows 2}
-        (check-guess
-          (number->digits "123")
-          (number->digits "213")))))
-(deftest _check-guess-3
-  (is (=
-        {:correct? true}
-        (check-guess
-          (number->digits "123")
-          (number->digits "123")))))
+(deftest bulls-and-cows
+  (are [result guess secret]
+    (= result (core/bulls-and-cows
+           (core/number->digits guess)
+           (core/number->digits secret)))
+    2 "122" "252"
+    1 "452" "122"))
 
-; одна итерация игры
-(comment
-  (game-step "345"))
+(deftest cows
+  (are [result guess secret]
+    (= result (core/cows
+                (core/number->digits guess)
+                (core/number->digits secret)))
+    0 "123" "123"
+    1 "122" "452"
+    0 "452" "122"))
 
-; запуск игры
-; критерий остановки -- пользователь угадал число
-(comment
-  (run-game))
+(deftest check-guess
+  (are [result guess secret]
+    (= result (core/check-guess
+                (core/number->digits guess)
+                (core/number->digits secret)))
+    {:correct? false :bulls 0 :cows 0} "123" "456"
+    {:correct? true} "123" "123"
+    {:correct? false :bulls 1 :cows 2} "123" "213"))
+
+(comment (deftest generate-secret
+   (is (=
+         (core/number->digits " 345 ")
+         (core/generate-secret))))
+
+  ; одна итерация игры
+  (comment
+    (core/game-step " 345 "))
+
+  ; запуск игры
+  ; критерий остановки -- пользователь угадал число
+  (comment
+    (core/run-game)))
