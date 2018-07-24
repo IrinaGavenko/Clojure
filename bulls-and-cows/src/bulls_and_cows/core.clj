@@ -22,14 +22,9 @@
   "Подсчет суммарного числа быков и коров"
   [guess secret]
   (->>
-    (map #(cow? secret %)
-         guess)
+    (map (partial cow? secret) guess)
     (filter true?)
     (count)))
-
-(bulls-and-cows
-  (number->digits "123")
-  (number->digits "453"))
 
 (defn cows
   "Подсчет коров"
@@ -55,7 +50,12 @@
 (defn generate-secret
   "Генерирование числа secret"
   []
-  (number->digits "345"))
+  (->>
+    (repeatedly #(rand-int 10000))
+    (filter (partial < 1000))
+    (first)
+    (str)
+    (number->digits)))
 
 (defn game-step
   "Одна итерация игры: чтение числа пользователя и
